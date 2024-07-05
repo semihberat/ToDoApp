@@ -20,7 +20,7 @@ function App() {
   return (
     <SafeAreaView>
       <View>
-        <Text>Hello World</Text>
+        <Text>Week 1</Text>
       </View>
     </SafeAreaView>
   );
