@@ -1,8 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, Alert} from 'react-native';
 import styles from './style';
 import Icon from 'react-native-vector-icons/AntDesign';
+import EditModal from '../editModal';
 const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
+  const [openModal, setOpenModal] = useState(false);
+  const [willEditText, setWillEditText] = useState(todo.text);
   const deleteTodo = () => {
     Alert.alert(
       'Deleting Process',
@@ -56,6 +59,24 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
       ],
     );
   };
+
+  const editTodo = () => {
+    const tempArr = [];
+    for (let i = 0; i < todos.length; i++) {
+      if (todos[i].id !== todo.id) {
+        tempArr.push(todos[i]);
+      } else {
+        const newTodo = {
+          ...todo,
+          text: willEditText,
+        };
+        tempArr.push(newTodo);
+        setOpenModal(!openModal);
+      }
+    }
+    setTodos(tempArr);
+  };
+
   return (
     <View style={styles.todoWrapper}>
       <View style={styles.textWrapper}>
@@ -74,13 +95,22 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
             color="green"
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setOpenModal(true)}>
           <Icon name="edit" size={25} color="gray" />
         </TouchableOpacity>
         <TouchableOpacity onPress={deleteTodo}>
           <Icon name="closecircle" size={25} color="red" />
         </TouchableOpacity>
       </View>
+      <EditModal
+        visible={openModal}
+        willEditText={willEditText}
+        modalFunction={editTodo}
+        setWillEditText={setWillEditText}
+        closeModal={() => {
+          setOpenModal(false);
+        }}
+      />
     </View>
   );
 };

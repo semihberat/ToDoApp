@@ -9,9 +9,11 @@ const Input = ({
   multiline = false,
   hasIcon = false,
   iconName = 'pluscircle',
-  value = "",
+  value = '',
   onChangeText = () => {},
-  onIconPress = () => {},
+  onIconPress = () => {
+    value = '';
+  },
 }) => {
   return (
     <View style={styles.wrapper}>
