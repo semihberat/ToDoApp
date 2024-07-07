@@ -25,6 +25,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
+  completedTitle: {
+    color: 'red',
+    textDecorationLine: 'line-through',
+  },
 });
 
 export default styles;
