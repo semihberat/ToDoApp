@@ -5,7 +5,7 @@ import styles from './style';
 const header = ({title = ''}) => {
   return (
     <View style={styles.headerWrapper}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title}></Text>
     </View>
   );
 };

@@ -3,9 +3,12 @@ import {View, Text, TouchableOpacity, Alert} from 'react-native';
 import styles from './style';
 import Icon from 'react-native-vector-icons/AntDesign';
 import EditModal from '../editModal';
+
+import setAsyncStorage from '../../helpers/asyncStorage';
 const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
   const [openModal, setOpenModal] = useState(false);
   const [willEditText, setWillEditText] = useState(todo.text);
+
   const deleteTodo = () => {
     Alert.alert(
       'Deleting Process',
@@ -19,7 +22,7 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
           text: 'Delete',
           onPress: () => {
             const filteredTodos = todos.filter(item => item.id !== todo.id);
-            setTodos(filteredTodos);
+            setAsyncStorage(filteredTodos, setTodos);
           },
           style: 'destructive',
         },
@@ -52,7 +55,7 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
                 tempArr.push(newTodo);
               }
             }
-            setTodos(tempArr);
+            setAsyncStorage(tempArr, setTodos);
           },
           style: 'destructive',
         },
@@ -61,6 +64,10 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
   };
 
   const editTodo = () => {
+    if (willEditText === '') {
+      Alert.alert('Blank Error', 'Text Area have not to be blank!');
+      return;
+    }
     const tempArr = [];
     for (let i = 0; i < todos.length; i++) {
       if (todos[i].id !== todo.id) {
@@ -71,7 +78,7 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
           text: willEditText,
         };
         tempArr.push(newTodo);
-        setOpenModal(!openModal);
+        setAsyncStorage(!openModal, setOpenModal);
       }
     }
     setTodos(tempArr);

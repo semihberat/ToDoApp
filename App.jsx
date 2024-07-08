@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   SafeAreaView,
@@ -23,6 +23,7 @@ import Todo from './src/components/todo/index';
 import generalStyles from './src/utils/generalStyles';
 import {colors} from './src/utils/constants';
 import Icon from 'react-native-vector-icons/dist/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function App() {
   const [text, setText] = useState('');
@@ -34,9 +35,30 @@ function App() {
       date: new Date(),
       completed: false,
     };
-    setTodos([...todos, newTodo]);
+    AsyncStorage.setItem('@todos', JSON.stringify([...todos, newTodo]))
+      .then(() => {
+        setTodos([...todos, newTodo]);
+      })
+      .catch(err => {
+        Alert.alert('Error', 'An error occurred while saving step');
+      });
     setText('');
   };
+
+  useEffect(() => {
+    AsyncStorage.getItem('@todos')
+      .then(res => {
+        if (res !== null) {
+          const parsedRes = JSON.parse(res);
+          console.log('parsedRes', parsedRes);
+          setTodos(parsedRes);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }, []);
+
   return (
     <SafeAreaView style={[generalStyles.flex1, generalStyles.bgWhite]}>
       <Header title="My Todo App" />
