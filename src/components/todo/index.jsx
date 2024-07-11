@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, TouchableOpacity, Alert} from 'react-native';
 import styles from './style';
 import Icon from 'react-native-vector-icons/AntDesign';
 import EditModal from '../editModal';
-
 import setAsyncStorage from '../../helpers/asyncStorage';
+import firestore from '@react-native-firebase/firestore';
 const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
   const [openModal, setOpenModal] = useState(false);
   const [willEditText, setWillEditText] = useState(todo.text);
