@@ -21,8 +21,13 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
         {
           text: 'Delete',
           onPress: () => {
-            const filteredTodos = todos.filter(item => item.id !== todo.id);
-            setAsyncStorage(filteredTodos, setTodos);
+            firestore()
+              .collection('todos')
+              .doc(todo.id)
+              .delete()
+              .then(() => {
+                console.log('Todo deleted!');
+              });
           },
           style: 'destructive',
         },
@@ -43,19 +48,15 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
         {
           text: 'Mark',
           onPress: () => {
-            const tempArr = [];
-            for (let i = 0; i < todos.length; i++) {
-              if (todos[i].id !== todo.id) {
-                tempArr.push(todos[i]);
-              } else {
-                const newTodo = {
-                  ...todo,
-                  completed: !todo.completed,
-                };
-                tempArr.push(newTodo);
-              }
-            }
-            setAsyncStorage(tempArr, setTodos);
+            firestore()
+              .collection('todos')
+              .doc(todo.id)
+              .update({
+                completed: !todo.completed,
+              })
+              .then(() => {
+                console.log('Todo updated!');
+              });
           },
           style: 'destructive',
         },
@@ -68,20 +69,16 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
       Alert.alert('Blank Error', 'Text Area have not to be blank!');
       return;
     }
-    const tempArr = [];
-    for (let i = 0; i < todos.length; i++) {
-      if (todos[i].id !== todo.id) {
-        tempArr.push(todos[i]);
-      } else {
-        const newTodo = {
-          ...todo,
-          text: willEditText,
-        };
-        tempArr.push(newTodo);
-        setAsyncStorage(!openModal, setOpenModal);
-      }
-    }
-    setTodos(tempArr);
+    firestore()
+      .collection('todos')
+      .doc(todo.id)
+      .update({
+        text: willEditText,
+        date: new Date(),
+      })
+      .then(() => {
+        console.log('Todo updated!');
+      });
   };
 
   return (
@@ -91,7 +88,7 @@ const Todo = ({todo = {}, todos = [], setTodos = () => {}}) => {
           {todo?.text}
         </Text>
         <Text style={styles.date}>
-          {new Date(todo?.date).toLocaleDateString('tr-TR')}
+          {new Date(todo?.date.seconds * 1000).toLocaleDateString('tr-TR')}
         </Text>
       </View>
       <View style={styles.iconsWrapper}>
