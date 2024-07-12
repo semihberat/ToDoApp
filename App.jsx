@@ -24,44 +24,48 @@ import generalStyles from './src/utils/generalStyles';
 import {colors} from './src/utils/constants';
 import Icon from 'react-native-vector-icons/dist/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import firestore, {query} from '@react-native-firebase/firestore';
 
 function App() {
   const [text, setText] = useState('');
   const [todos, setTodos] = useState([]);
-  const addTodo = () => {
-    const newTodo = {
-      id: String(new Date().getTime()),
-      text: text,
-      date: new Date(),
-      completed: false,
-    };
-    AsyncStorage.setItem('@todos', JSON.stringify([...todos, newTodo]))
-      .then(() => {
-        setTodos([...todos, newTodo]);
-      })
-      .catch(err => {
-        Alert.alert('Error', 'An error occurred while saving step');
+  const [id, setId] = useState(0);
+  const addTodo = async () => {
+    try {
+      const querySnapshot = await firestore().collection('todos');
+      querySnapshot.add({
+        text: text,
+        date: new Date(),
+        completed: false,
       });
-    setText('');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    AsyncStorage.getItem('@todos')
-      .then(res => {
-        if (res !== null) {
-          const parsedRes = JSON.parse(res);
-          console.log('parsedRes', parsedRes);
-          setTodos(parsedRes);
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }, []);
+    (async () => {
+      const tempArray = [];
+      try {
+        const querySnapshot = await firestore()
+          .collection('todos')
+          .orderBy('date', 'desc')
+          .get();
+
+        querySnapshot.forEach(data => {
+          tempArray.push({...data.data(), id: data.id});
+        });
+        setTodos(tempArray);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  });
 
   return (
     <SafeAreaView style={[generalStyles.flex1, generalStyles.bgWhite]}>
       <Header title="My Todo App" />
+
       <View style={generalStyles.flex1}>
         <Input
           placeholder="Trial"
